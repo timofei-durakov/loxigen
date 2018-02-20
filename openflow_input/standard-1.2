@@ -230,6 +230,12 @@ enum ofp_flow_mod_flags(wire_type=uint16_t, bitmask=True) {
     OFPFF_SEND_FLOW_REM = 0x1,
     OFPFF_CHECK_OVERLAP = 0x2,
     OFPFF_RESET_COUNTS = 0x4,
+    OFPFF_NO_PKT_COUNTS = 0x8,
+    OFPFF_NO_BYT_COUNTS = 0x10,
+
+    /* Non-standard, enabled by an experimenter message */
+    /* See the bsn_flow_idle input file */
+    OFPFF_BSN_SEND_IDLE = 0x80,
 };
 
 enum ofp_group(wire_type=uint32_t, complete=False) {
@@ -1163,7 +1169,8 @@ struct of_flow_stats_entry {
     uint16_t priority;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
-    pad(6);
+    enum ofp_flow_mod_flags flags;
+    pad(4);
     uint64_t cookie;
     uint64_t packet_count;
     uint64_t byte_count;

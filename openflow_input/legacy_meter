@@ -24,6 +24,7 @@ enum ofp_legacy_meter_flags(wire_type=uint16_t, bitmask=True) {
     OFPMF_PKTPS = 0x2,
     OFPMF_BURST = 0x4,
     OFPMF_STATS = 0x8,
+    OFPMF_MASK = 0x0F
 };
 
 enum ofp_legacy_meter_mod_failed_code(wire_type=uint16_t) {
