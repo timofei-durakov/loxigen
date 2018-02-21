@@ -230,6 +230,12 @@ enum ofp_flow_mod_flags(wire_type=uint16_t, bitmask=True) {
     OFPFF_SEND_FLOW_REM = 0x1,
     OFPFF_CHECK_OVERLAP = 0x2,
     OFPFF_RESET_COUNTS = 0x4,
+    OFPFF_NO_PKT_COUNTS = 0x8,
+    OFPFF_NO_BYT_COUNTS = 0x10,
+
+    /* Non-standard, enabled by an experimenter message */
+    /* See the bsn_flow_idle input file */
+    OFPFF_BSN_SEND_IDLE = 0x80,
 };
 
 enum ofp_group(wire_type=uint32_t, complete=False) {
@@ -277,6 +283,7 @@ enum ofp_error_type(wire_type=uint16_t) {
     OFPET_QUEUE_OP_FAILED = 9,
     OFPET_SWITCH_CONFIG_FAILED = 10,
     OFPET_ROLE_REQUEST_FAILED = 11,
+    OFPET_METER_MOD_FAILED = 12,
     OFPET_EXPERIMENTER = 0xffff,
 };
 
@@ -406,6 +413,21 @@ enum ofp_role_request_failed_code (wire_type=uint16_t){
     OFPRRFC_STALE = 0,
     OFPRRFC_UNSUP = 1,
     OFPRRFC_BAD_ROLE = 2,
+};
+
+enum ofp_meter_mod_failed_code(wire_type=uint16_t) {
+    OFPMMFC_UNKNOWN = 0,
+    OFPMMFC_METER_EXISTS = 1,
+    OFPMMFC_INVALID_METER = 2,
+    OFPMMFC_UNKNOWN_METER = 3,
+    OFPMMFC_BAD_COMMAND = 4,
+    OFPMMFC_BAD_FLAGS = 5,
+    OFPMMFC_BAD_RATE = 6,
+    OFPMMFC_BAD_BURST = 7,
+    OFPMMFC_BAD_BAND = 8,
+    OFPMMFC_BAD_BAND_VALUE = 9,
+    OFPMMFC_OUT_OF_METERS = 10,
+    OFPMMFC_OUT_OF_BANDS = 11,
 };
 
 enum ofp_stats_type(wire_type=uint16_t) {
@@ -1114,6 +1136,16 @@ struct of_role_request_failed_error_msg : of_error_msg {
     of_octets_t data;
 };
 
+struct of_meter_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 12;
+    enum ofp_meter_mod_failed_code code;
+    of_octets_t data;
+};
+
 struct of_experimenter_error_msg : of_error_msg {
     uint8_t version;
     uint8_t type == 1;
@@ -1137,7 +1169,8 @@ struct of_flow_stats_entry {
     uint16_t priority;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
-    pad(6);
+    enum ofp_flow_mod_flags flags;
+    pad(4);
     uint64_t cookie;
     uint64_t packet_count;
     uint64_t byte_count;
