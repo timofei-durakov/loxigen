@@ -19,27 +19,53 @@ import org.projectfloodlight.openflow.types.IPv4Address;
 import org.projectfloodlight.openflow.types.IPv4AddressWithMask;
 
 public class OFOxmTest {
-    private OFOxms oxms;
+    private OFOxms oF13oxms;
+    private OFOxms oF12oxms;
 
     @Before
     public void setup() {
-        oxms = OFFactories.getFactory(OFVersion.OF_13).oxms();
+        oF12oxms = OFFactories.getFactory(OFVersion.OF_12).oxms();
+        oF13oxms = OFFactories.getFactory(OFVersion.OF_13).oxms();
     }
 
     @Test
-    public void testGetCanonicalFullMask() {
+    public void testOF12GetCanonicalFullMask() {
         IPv4AddressWithMask empty = IPv4AddressWithMask.of("0.0.0.0/0");
         assertEquals(IPv4Address.FULL_MASK, empty.getMask());
-        OFOxmIpv4SrcMasked ipv4SrcMasked = oxms.ipv4SrcMasked(empty.getValue(), empty.getMask());
+        OFOxmIpv4SrcMasked ipv4SrcMasked = oF12oxms.ipv4SrcMasked(empty.getValue(), empty.getMask());
+        // OF12 getCanonical() must not change anything
+        assertEquals(ipv4SrcMasked.getCanonical(), ipv4SrcMasked);
+    }
+
+    @Test
+    public void testOF13GetCanonicalFullMask() {
+        IPv4AddressWithMask empty = IPv4AddressWithMask.of("0.0.0.0/0");
+        assertEquals(IPv4Address.FULL_MASK, empty.getMask());
+        OFOxmIpv4SrcMasked ipv4SrcMasked = oF13oxms.ipv4SrcMasked(empty.getValue(), empty.getMask());
         // canonicalize should remove /0
         assertNull(ipv4SrcMasked.getCanonical());
     }
 
     @Test
-    public void testGetCanonicalNoMask() {
+    public void testOF12GetCanonicalNoMask() {
         IPv4AddressWithMask fullIp = IPv4AddressWithMask.of("1.2.3.4/32");
         assertEquals(IPv4Address.NO_MASK, fullIp.getMask());
-        OFOxmIpv4SrcMasked ipv4SrcMasked = oxms.ipv4SrcMasked(fullIp.getValue(), fullIp.getMask());
+        OFOxmIpv4SrcMasked ipv4SrcMasked = oF13oxms.ipv4SrcMasked(fullIp.getValue(), fullIp.getMask());
+        assertTrue(ipv4SrcMasked.isMasked());
+        assertEquals(IPv4Address.NO_MASK, ipv4SrcMasked.getMask());
+
+        // OF12 getCanonical() must not change anything
+        OFOxm<IPv4Address> canonical = ipv4SrcMasked.getCanonical();
+        assertThat(canonical, CoreMatchers.instanceOf(OFOxmIpv4SrcMasked.class));
+        assertTrue(canonical.isMasked());
+        assertEquals(IPv4Address.NO_MASK, canonical.getMask());
+    }
+
+    @Test
+    public void testOF13GetCanonicalNoMask() {
+        IPv4AddressWithMask fullIp = IPv4AddressWithMask.of("1.2.3.4/32");
+        assertEquals(IPv4Address.NO_MASK, fullIp.getMask());
+        OFOxmIpv4SrcMasked ipv4SrcMasked = oF13oxms.ipv4SrcMasked(fullIp.getValue(), fullIp.getMask());
         assertTrue(ipv4SrcMasked.isMasked());
         assertEquals(IPv4Address.NO_MASK, ipv4SrcMasked.getMask());
 
@@ -52,7 +78,7 @@ public class OFOxmTest {
     @Test
     public void testGetCanonicalNormalMask() {
         IPv4AddressWithMask ip = IPv4AddressWithMask.of("1.2.3.0/24");
-        OFOxmIpv4SrcMasked ipv4SrcMasked = oxms.ipv4SrcMasked(ip.getValue(), ip.getMask());
+        OFOxmIpv4SrcMasked ipv4SrcMasked = oF13oxms.ipv4SrcMasked(ip.getValue(), ip.getMask());
         assertTrue(ipv4SrcMasked.isMasked());
 
         // canonicalize should convert the masked oxm to the non-masked one
