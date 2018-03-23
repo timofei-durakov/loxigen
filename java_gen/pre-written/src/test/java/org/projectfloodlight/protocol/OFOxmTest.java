@@ -50,7 +50,7 @@ public class OFOxmTest {
     public void testOF12GetCanonicalNoMask() {
         IPv4AddressWithMask fullIp = IPv4AddressWithMask.of("1.2.3.4/32");
         assertEquals(IPv4Address.NO_MASK, fullIp.getMask());
-        OFOxmIpv4SrcMasked ipv4SrcMasked = oF13oxms.ipv4SrcMasked(fullIp.getValue(), fullIp.getMask());
+        OFOxmIpv4SrcMasked ipv4SrcMasked = oF12oxms.ipv4SrcMasked(fullIp.getValue(), fullIp.getMask());
         assertTrue(ipv4SrcMasked.isMasked());
         assertEquals(IPv4Address.NO_MASK, ipv4SrcMasked.getMask());
 
