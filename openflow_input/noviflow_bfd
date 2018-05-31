@@ -2,8 +2,9 @@
 #version 5
 #version 6
 
-struct of_action_noviflow_bfd_start : of_action_experimenter_noviflow {
+struct of_action_noviflow_bfd_start : of_action_noviflow {
     uint8_t type == 0xFFFF;
+    uint16_t len;
     uint32_t experimenter == 0xFF000002;
     uint8_t customer == 0xFF;
     uint8_t reserved == 0x00;

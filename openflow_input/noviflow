@@ -2,8 +2,19 @@
 #version 5
 #version 6
 
-struct of_action_experimenter_noviflow: of_action_experimenter {
+struct of_noviflow_header: of_experimenter {
+    uint8_t version;
+    uint8_t type == 4;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t experimenter == 0xff000002;
+};
+
+struct of_action_noviflow: of_action_experimenter {
     uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter == 0xff000002;
+    uint8_t customer == 0xFF;
+    uint8_t reserved == 0x00;
+    uint16_t novi_action_type == ?;
 };
