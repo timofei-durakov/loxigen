@@ -11,10 +11,10 @@ struct of_noviflow_header: of_experimenter {
 };
 
 struct of_action_noviflow: of_action_experimenter {
-    uint16_t type == 65535;
-    uint16_t len;
-    uint32_t experimenter == 0xff000002;
-    uint8_t customer == 0xFF;
-    uint8_t reserved == 0x00;
-    uint16_t novi_action_type == ?;
+    uint16_t type == 65535;                 // 2
+    uint16_t len;                           // 2
+    uint32_t experimenter == 0xff000002;    // 4
+//    uint8_t customer == 0xFF;               // 1
+//    uint8_t reserved == 0x00;               // 1
+//    uint16_t novi_action_type == ?;         // 2
 };
