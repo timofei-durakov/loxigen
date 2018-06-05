@@ -2,14 +2,18 @@
 #version 5
 #version 6
 
-struct of_noviflow : of_noviflow_header {
+struct of_noviflow_base_error: of_experimenter_error_msg {
     uint8_t version;
     uint8_t type == 4;
-    uint16_t length;
-    uint32_t xid;
+    uint8_t novi_error_type == ?;
+    uint8_t novi_error_code;
     uint32_t experimenter == 0xff000002;
-//    uint32_t subtype == 60;
-//    uint16_t vlan_vid;
-//    pad(2);
-//    of_ipv4_t ipv4_addr;
 };
+
+//struct of_noviflow_bfd_failed: of_noviflow_base_error {
+//    uint8_t version;
+//    uint8_t type == 4;
+//    uint8_t novi_error_type == 3;
+//    uint8_t novi_error_code;
+//    uint32_t experimenter == 0xff000002;
+//};
