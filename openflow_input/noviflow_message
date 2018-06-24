@@ -1,0 +1,14 @@
+#version 4
+#version 5
+#version 6
+
+struct of_noviflow_base_error: of_experimenter_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0xffff;
+     uint16_t subtype;
+    uint32_t experimenter == 0xff000002;
+    of_octets_t data;
+};

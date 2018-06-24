@@ -1,0 +1,18 @@
+#version 4
+#version 5
+#version 6
+
+struct of_action_noviflow_bfd_start : of_action_noviflow {
+    uint16_t type == 0xFFFF;
+    uint16_t len;
+    uint32_t experimenter == 0xFF000002;
+    uint8_t customer == 0xFF;
+    uint8_t reserved == 0x00;
+    uint16_t novi_action_type == 0x0004;
+    uint32_t port_no;
+    uint32_t my_disc;
+    uint32_t interval;
+    uint8_t multiplier;
+    uint8_t keepAliveTimeout;
+    pad(6);
+};
