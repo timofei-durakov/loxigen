@@ -1,0 +1,22 @@
+/*
+ * Copy field
+ */
+
+#version 4
+#version 5
+#version 6
+
+struct of_action_noviflow_copy_field : of_action_noviflow {
+    uint16_t type == 0xFFFF;
+    uint16_t len;
+    uint32_t experimenter == 0xFF000002;
+    uint8_t customer == 0xFF;
+    uint8_t reserved == 0x00;
+    uint16_t novi_action_type == 0x0005;
+    uint16_t n_bits;      // Number of bits to copy
+    uint16_t src_offset;  // Starting bit offset in source
+    uint16_t dst_offset;  // Starting bit offset in destination
+    pad(2);
+    list(of_uint32_t) oxm_ids;
+    pad(4);
+};
