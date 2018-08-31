@@ -1,0 +1,36 @@
+#version 4
+#version 5
+#version 6
+
+struct of_action_noviflow_bfd_start : of_action_noviflow {
+    uint16_t type == 0xFFFF;
+    uint16_t len;
+    uint32_t experimenter == 0xFF000002;
+    uint8_t customer == 0xFF;
+    uint8_t reserved == 0x00;
+    uint16_t novi_action_type == 0x0004;
+    uint32_t port_no;
+    uint32_t my_disc;
+    uint32_t interval;
+    uint8_t multiplier;
+    uint8_t keepAliveTimeout;
+    pad(6);
+};
+
+struct of_action_noviflow_copy_field : of_action_noviflow {
+    uint16_t type == 0xFFFF;
+    uint16_t len;
+    uint32_t experimenter == 0xFF000002;
+    uint8_t customer == 0xFF;
+    uint8_t reserved == 0x00;
+    uint16_t novi_action_type == 0x0005;
+    uint16_t n_bits;      // Number of bits to copy
+    uint16_t src_offset;  // Starting bit offset in source
+    uint16_t dst_offset;  // Starting bit offset in destination
+    pad(2);
+    uint32_t oxm_src_header;
+    uint32_t hack1 == 0xFF000002;
+    uint32_t oxm_dst_header;
+    uint32_t hack2 == 0xFF000002;
+    pad(4);
+};

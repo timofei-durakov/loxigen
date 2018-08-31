@@ -304,6 +304,15 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<OFBooleanValue>("bsn_ip_fragmentation", MatchFields.BSN_IP_FRAGMENTATION,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
+    public final static MatchField<U8> NOVIFLOW_RXTIMESTAMP =
+            new MatchField<U8>("noviflow_rxtimestamp", MatchFields.NOVIFLOW_RXTIMESTAMP);
+
+    public final static MatchField<U8> NOVIFLOW_TXTIMESTAMP =
+            new MatchField<U8>("noviflow_txtimestamp", MatchFields.NOVIFLOW_TXTIMESTAMP);
+
+    public final static MatchField<U8> NOVIFLOW_PACKET_OFFSET =
+            new MatchField<U8>("noviflow_packet_offset", MatchFields.NOVIFLOW_PACKET_OFFSET);
+
     public String getName() {
         return name;
     }
