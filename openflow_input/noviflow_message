@@ -8,7 +8,7 @@ struct of_noviflow_base_error: of_experimenter_error_msg {
     uint16_t length;
     uint32_t xid;
     uint16_t err_type == 0xffff;
-     uint16_t subtype;
+    uint16_t subtype;
     uint32_t experimenter == 0xff000002;
     of_octets_t data;
 };

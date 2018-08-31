@@ -310,6 +310,9 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<U8> NOVIFLOW_TXTIMESTAMP =
             new MatchField<U8>("noviflow_txtimestamp", MatchFields.NOVIFLOW_TXTIMESTAMP);
 
+    public final static MatchField<U8> NOVIFLOW_PACKET_OFFSET =
+            new MatchField<U8>("noviflow_packet_offset", MatchFields.NOVIFLOW_PACKET_OFFSET);
+
     public String getName() {
         return name;
     }
