@@ -34,3 +34,31 @@ struct of_action_noviflow_copy_field : of_action_noviflow {
     uint32_t hack2 == 0xFF000002;
     pad(4);
 };
+
+struct of_action_noviflow_push_vxlan_tunnel : of_action_noviflow {
+    uint16_t type == 0xFFFF;
+    uint16_t len;
+    uint32_t experimenter == 0xFF000002;
+    uint8_t customer == 0xFF;
+    uint8_t reserved == 0x00;
+    uint16_t novi_action_type == 0x0002;    // NOVI_ACTION_PUSH_TUNNEL
+    uint8_t tunnel_type == 0x00;            // NOVI_TUNNEL_TYPE_VXLAN
+    uint8_t flags;
+    of_mac_addr_t eth_src;
+    of_mac_addr_t eth_dst;
+    of_ipv4_t ipv4_src;
+    of_ipv4_t ipv4_dst;
+    uint16_t udp_src;
+    uint32_t vni;
+};
+
+struct of_action_noviflow_pop_vxlan_tunnel : of_action_noviflow {
+    uint16_t type == 0xFFFF;
+    uint16_t len;
+    uint32_t experimenter == 0xFF000002;
+    uint8_t customer == 0xFF;
+    uint8_t reserved == 0x00;
+    uint16_t novi_action_type == 0x0003;    // NOVI_ACTION_POP_TUNNEL
+    uint8_t tunnel_type == 0x00;            // NOVI_TUNNEL_TYPE_VXLAN
+    pad(3);
+};
