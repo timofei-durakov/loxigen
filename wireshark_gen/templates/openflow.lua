@@ -99,9 +99,11 @@ ${ofclass.name}_v${version.wire_version}_dissectors = {}
 :: include('_ofclass_dissector.lua', name=name, ofclass=ofclass, version=version)
 :: if ofclass.superclass:
 :: discriminator = ofclass.superclass.discriminator
+:: if discriminator:
 :: discriminator_value = ofclass.member_by_name(discriminator.name).value
 ${ofclass.superclass.name}_v${version.wire_version}_dissectors[${discriminator_value}] = ${name}
 
+:: #endif
 :: #endif
 :: #endfor
 :: #endfor
