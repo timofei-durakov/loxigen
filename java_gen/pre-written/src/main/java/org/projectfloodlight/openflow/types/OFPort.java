@@ -30,6 +30,9 @@ public class OFPort implements OFValueType<OFPort> {
     private static final int OFPP_FLOOD_INT = 0xFFffFFfb;
     private static final int OFPP_NORMAL_INT = 0xFFffFFfa;
     private static final int OFPP_TABLE_INT = 0xFFffFFf9;
+    private static final int OFPP_NOVIFLOW_EXTRA2_INT = 0xFFffFF03;
+    private static final int OFPP_NOVIFLOW_EXTRA1_INT = 0xFFffFF02;
+    private static final int OFPP_NOVIFLOW_EXTRA0_INT = 0xFFffFF01;
     private static final int OFPP_MAX_INT = 0xFFffFF00;
     private static final int OFPP_IN_PORT_INT = 0xFFffFFf8;
 
@@ -56,6 +59,25 @@ public class OFPort implements OFValueType<OFPort> {
      * used in order to send back out of the input port.
      */
     public final static OFPort IN_PORT = new NamedPort(OFPP_IN_PORT_INT, "in_port");
+
+    /**
+     * Noviflow's extra "special" ports.
+     *
+     * On NS1XXX series:
+     *   - OF --> 0xFFFFFF01 (NOVIFLOW_EXTRA0)
+     * On NS2XXX series:
+     *   - CLI --> 0xFFFFFF01 (NOVIFLOW_EXTRA0)
+     *   - OF1 --> 0xFFFFFF02 (NOVIFLOW_EXTRA1)
+     *   - OF2 --> 0xFFFFFF03 (NOVIFLOW_EXTRA2)
+     * On Tofino:
+     *   - MGMT --> 0xFFFFFF01 (NOVIFLOW_EXTRA0)
+     * and if present
+     *   - CTRL1 --> 0xFFFFFF02 (NOVIFLOW_EXTRA1)
+     *   - CTRL2 --> 0xFFFFFF03 (NOVIFLOW_EXTRA2)
+     */
+    public final static OFPort NOVIFLOW_EXTRA0 = new OFPort(OFPP_NOVIFLOW_EXTRA0_INT);
+    public final static OFPort NOVIFLOW_EXTRA1 = new OFPort(OFPP_NOVIFLOW_EXTRA1_INT);
+    public final static OFPort NOVIFLOW_EXTRA2 = new OFPort(OFPP_NOVIFLOW_EXTRA2_INT);
 
     /**
      * Submit the packet to the first flow table NB: This destination port can
@@ -266,6 +288,12 @@ public class OFPort implements OFValueType<OFPort> {
                 return MAX;
             case OFPP_IN_PORT_INT:
                 return IN_PORT;
+            case OFPP_NOVIFLOW_EXTRA2_INT:
+                return NOVIFLOW_EXTRA2;
+            case OFPP_NOVIFLOW_EXTRA1_INT:
+                return NOVIFLOW_EXTRA1;
+            case OFPP_NOVIFLOW_EXTRA0_INT:
+                return NOVIFLOW_EXTRA0;
             case OFPP_TABLE_INT:
                 return TABLE;
             case OFPP_NORMAL_INT:
