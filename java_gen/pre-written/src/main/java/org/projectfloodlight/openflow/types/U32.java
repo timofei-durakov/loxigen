@@ -48,6 +48,9 @@ public class U32 implements Writeable, OFValueType<U32> {
             return ZERO;
         if(raw == NO_MASK_VAL)
             return NO_MASK;
+        if (raw >= 0 && raw < U32Cache.cache.length) {
+            return U32Cache.cache[raw];
+        }
         return new U32(raw);
     }
 
@@ -127,4 +130,19 @@ public class U32 implements Writeable, OFValueType<U32> {
     @Override
     public void putTo(PrimitiveSink sink) {
         sink.putInt(raw);
-    }}
+    }
+
+    private static class U32Cache {
+        static final U32[] cache = new U32[1024];
+
+        private U32Cache() {
+        }
+
+        static {
+            for (int v = 0; v < cache.length; ++v) {
+                cache[v] = new U32(v);
+            }
+
+        }
+    }
+}

@@ -1,18 +1,18 @@
 /**
- *    Copyright (c) 2008 The Board of Trustees of The Leland Stanford Junior
- *    University
+ * Copyright (c) 2008 The Board of Trustees of The Leland Stanford Junior
+ * University
  *
- *    Licensed under the Apache License, Version 2.0 (the "License"); you may
- *    not use this file except in compliance with the License. You may obtain
- *    a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *    License for the specific language governing permissions and limitations
- *    under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
  **/
 
 package org.projectfloodlight.openflow.types;
@@ -40,15 +40,21 @@ public class U8 implements Writeable, OFValueType<U8> {
     }
 
     public static final U8 of(short value) {
-        if(value == ZERO_VAL)
+        if (value == ZERO_VAL)
             return ZERO;
-        if(value == NO_MASK_VAL)
+        if (value == NO_MASK_VAL)
             return NO_MASK;
+        if (value >= 0 && value < U8Cache.cache.length) {
+            return U8Cache.cache[value];
+        }
 
         return new U8(t(value));
     }
 
     public static final U8 ofRaw(byte value) {
+        if (value >= 0 && value < U8Cache.cache.length) {
+            return U8Cache.cache[value];
+        }
         return new U8(value);
     }
 
@@ -118,7 +124,7 @@ public class U8 implements Writeable, OFValueType<U8> {
 
     @Override
     public U8 applyMask(U8 mask) {
-        return ofRaw( (byte) (raw & mask.raw));
+        return ofRaw((byte) (raw & mask.raw));
     }
 
     @Override
@@ -130,4 +136,18 @@ public class U8 implements Writeable, OFValueType<U8> {
     public void putTo(PrimitiveSink sink) {
         sink.putByte(raw);
     }
- }
+
+    private static class U8Cache {
+        static final U8[] cache = new U8[256];
+
+        private U8Cache() {
+        }
+
+        static {
+            for (short v = 0; v < cache.length; ++v) {
+                cache[v] = new U8(t(v));
+            }
+
+        }
+    }
+}

@@ -49,6 +49,9 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
     public static U64 ofRaw(final long raw) {
         if(raw == ZERO_VAL)
             return ZERO;
+        if (raw >= 0 && raw < U64Cache.cache.length) {
+            return U64Cache.cache[(int)raw];
+        }
         return new U64(raw);
     }
 
@@ -234,4 +237,17 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
         }
     }
 
+    private static class U64Cache {
+        static final U64[] cache = new U64[1024];
+
+        private U64Cache() {
+        }
+
+        static {
+            for (int v = 0; v < cache.length; ++v) {
+                cache[v] = new U64(v);
+            }
+
+        }
+    }
 }

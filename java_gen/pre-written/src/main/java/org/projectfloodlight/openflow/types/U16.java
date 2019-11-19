@@ -54,6 +54,9 @@ public class U16 implements Writeable, OFValueType<U16> {
     public static final U16 ofRaw(short raw) {
         if(raw == ZERO_VAL)
             return ZERO;
+        if (raw >= 0 && raw < U16Cache.cache.length) {
+            return U16Cache.cache[raw];
+        }
         return new U16(raw);
     }
 
@@ -126,5 +129,20 @@ public class U16 implements Writeable, OFValueType<U16> {
     @Override
     public void putTo(PrimitiveSink sink) {
         sink.putShort(raw);
+    }
+
+
+    private static class U16Cache {
+        static final U16[] cache = new U16[1024];
+
+        private U16Cache() {
+        }
+
+        static {
+            for (short v = 0; v < cache.length; ++v) {
+                cache[v] = new U16(v);
+            }
+
+        }
     }
 }
