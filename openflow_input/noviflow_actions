@@ -62,3 +62,19 @@ struct of_action_noviflow_pop_vxlan_tunnel : of_action_noviflow {
     uint8_t tunnel_type == 0x00;            // NOVI_TUNNEL_TYPE_VXLAN
     pad(3);
 };
+
+struct of_action_noviflow_swap_field : of_action_noviflow {
+    uint16_t type == 0xFFFF;
+    uint16_t len;
+    uint32_t experimenter == 0xFF000002;
+    uint8_t customer == 0xFF;
+    uint8_t reserved == 0x00;
+    uint16_t novi_action_type == 0x0009;
+    uint16_t n_bits;      // Number of bits to copy
+    uint16_t src_offset;  // Starting bit offset in source
+    uint16_t dst_offset;  // Starting bit offset in destination
+    pad(2);
+    uint32_t oxm_src_header;
+    uint32_t oxm_dst_header;
+    pad(4);
+};
