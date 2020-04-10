@@ -823,6 +823,9 @@ exceptions = {
         'of_flow_stats_request' : { 'out_group' : of_group },
         'of_flow_lightweight_stats_request' : { 'out_group' : of_group },
 
+        'of_oxm_noviflow_upd_payload' : { 'value' : u8obj},
+        'of_oxm_noviflow_ip_payload' : { 'value' : u8obj},
+        'of_oxm_noviflow_eth_payload' : { 'value' : u8obj},
         'of_oxm_noviflow_rxtimestamp' : { 'value' : u8obj},
         'of_oxm_noviflow_txtimestamp' : { 'value' : u8obj},
         'of_oxm_noviflow_packet_offset' : { 'value' : u8obj}

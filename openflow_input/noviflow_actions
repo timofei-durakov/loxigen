@@ -63,6 +63,18 @@ struct of_action_noviflow_pop_vxlan_tunnel : of_action_noviflow {
     pad(3);
 };
 
+struct of_action_noviflow_hash_fields_sym : of_action_noviflow {
+    uint16_t type == 0xFFFF;
+    uint16_t len;
+    uint32_t experimenter == 0xFF000002;
+    uint8_t customer == 0xFF;
+    uint8_t reserved == 0x00;
+    uint16_t novi_action_type == 0x0007;    // NOVI_ACTION_HASH_FIELDS_SYM
+    uint8_t fields_num;
+    list(of_uint32_t) oxm_ids;
+
+};
+
 struct of_action_noviflow_swap_field : of_action_noviflow {
     uint16_t type == 0xFFFF;
     uint16_t len;
