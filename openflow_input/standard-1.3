@@ -249,6 +249,7 @@ enum ofp_flow_mod_flags(wire_type=uint16_t, bitmask=True) {
     OFPFF_RESET_COUNTS = 0x4,
     OFPFF_NO_PKT_COUNTS = 0x8,
     OFPFF_NO_BYT_COUNTS = 0x10,
+    OFPFF_PERSISTENT = 0x8000, // NoviFlow persistent custom flag
 
     /* Non-standard, enabled by an experimenter message */
     /* See the bsn_flow_idle input file */
