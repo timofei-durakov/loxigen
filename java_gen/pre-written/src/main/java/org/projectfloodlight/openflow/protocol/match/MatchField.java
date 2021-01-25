@@ -25,6 +25,7 @@ import org.projectfloodlight.openflow.types.PacketType;
 import org.projectfloodlight.openflow.types.U16;
 import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U64;
+import org.projectfloodlight.openflow.types.U128;
 import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.UDF;
 import org.projectfloodlight.openflow.types.VRF;
