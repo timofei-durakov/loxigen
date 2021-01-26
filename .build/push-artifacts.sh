@@ -51,21 +51,30 @@ fi
     set -xe
     cd $ARTIFACT_REPO
     echo $last_loxi_log >loxi-revision
+
+    # if changes in the working dir
+    git status
     git add -A
 
-    (
-       echo "Artifacts from ${loxi_github_url} (Branch ${loxi_branch})"
-       echo
-       echo "Loxigen Head commit floodlight/loxigen@${loxi_head}"
-       cat $git_log_file
-    ) | git commit --file=-
+    if ! git diff-index --cached --exit-code HEAD --; then
+        (
+        echo "Artifacts from ${loxi_github_url} (Branch ${loxi_branch})"
+        echo
+        echo "Loxigen Head commit floodlight/loxigen@${loxi_head}"
+        cat $git_log_file
+        ) | git commit --file=-
 
-    git tag -a -f "loxi/${loxi_head}" -m "Tag Loxigen Revision ${loxi_head}"
-    git push --tags -f
-    if [[ $ARTIFACT_TARGET_BRANCH != $ARTIFACT_REPO_BRANCH ]]; then
-        git push -f origin HEAD:${ARTIFACT_TARGET_BRANCH}
+        git tag -a -f "loxi/${loxi_head}" -m "Tag Loxigen Revision ${loxi_head}"
+        git push --tags -f
+        if [[ $ARTIFACT_TARGET_BRANCH != $ARTIFACT_REPO_BRANCH ]]; then
+            git push -f origin HEAD:${ARTIFACT_TARGET_BRANCH}
+        else
+            git push origin HEAD
+        fi
     else
-        git push origin HEAD
+        echo "No changes in the working dir."
+        echo "Branch $ARTIFACT_TARGET_BRANCH already seems to have the latest from loxi branch ${loxi_branch}"
+        echo "Loxigen head commit ${loxi_head}"
     fi
 )
 

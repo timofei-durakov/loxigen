@@ -31,6 +31,7 @@
 # @fixme This needs to be refactored and brought into the 21st century.
 #
 
+from collections import OrderedDict
 import loxi_globals
 
 ################################################################
@@ -183,6 +184,8 @@ of_base_types = dict(
                     short_name="u32"),
     uint64_t = dict(bytes=8, to_w="u64_hton", from_w="u64_ntoh", use_as_rv=1,
                     short_name="u64"),
+    uint128_t = dict(bytes=16, to_w="u128_hton", from_w="u128_ntoh", use_as_rv=1,
+                    short_name="u128"),
 #    of_cookie_t = dict(bytes=8, to_w="u64_hton", from_w="u64_ntoh", use_as_rv=1#,
 #                    short_name="cookie"),
 #    of_counter_t = dict(bytes=8, to_w="u64_hton", from_w="u64_ntoh", use_as_rv=1,
@@ -217,7 +220,7 @@ of_base_types = dict(
     of_checksum_128_t = dict(bytes=16, short_name="checksum_128"),
 )
 
-of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
+of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t", "uint128_t",
                    "of_port_no_t", "of_fm_cmd_t", "of_wc_bmap_t",
                    "of_match_bmap_t", "of_port_name_t", "of_table_name_t",
                    "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
@@ -235,7 +238,7 @@ of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
 # ofp_name: The original name for the identifier
 # ofp_group: The ofp enumerated type if defined
 
-identifiers = {}
+identifiers = OrderedDict()
 
 ##
 # Identifiers by original group
@@ -320,8 +323,10 @@ for version in loxi_globals.OFVersions.all_supported:
 ################################################################
 
 # The map of known experimenters to their experimenter IDs
-experimenter_name_to_id = dict(
-    bsn = 0x005c16c7,
-    nicira = 0x00002320,
-    openflow = 0x000026e1
-    )
+experimenter_name_to_id = OrderedDict(
+    [
+        ('bsn', 0x005c16c7),
+        ('nicira', 0x00002320),
+        ('openflow', 0x000026e1)
+    ]
+)

@@ -1,4 +1,4 @@
-// Copyright 2013-2017, Big Switch Networks, Inc.
+// Copyright 2013-2018, Big Switch Networks, Inc.
 //
 // LoxiGen is licensed under the Eclipse Public License,
 // version 1.0 (EPL), with the following special exception:
@@ -482,9 +482,16 @@ struct of_bsn_tlv_vlan_pcp : of_bsn_tlv {
     uint8_t value;
 };
 
+enum ofp_bsn_strip_vlan(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_STRIP_VLAN_FIRST = 0x01,
+    OFP_BSN_STRIP_VLAN_SECOND = 0x02,
+    OFP_BSN_STRIP_VLAN_THIRD = 0x04,
+};
+
 struct of_bsn_tlv_strip_vlan_on_egress : of_bsn_tlv {
     uint16_t type == 73;
     uint16_t length;
+    enum ofp_bsn_strip_vlan flags;
 };
 
 struct of_bsn_tlv_set_loopback_mode: of_bsn_tlv {
@@ -884,9 +891,16 @@ struct of_bsn_tlv_ipv6_dst : of_bsn_tlv {
     of_ipv6_t value;
 };
 
+enum ofp_bsn_push_vlan(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_PUSH_VLAN_UNTAGGED = 0x01,
+    OFP_BSN_PUSH_VLAN_SINGLE_TAGGED = 0x02,
+    OFP_BSN_PUSH_VLAN_DOUBLE_TAGGED = 0x04,
+};
+
 struct of_bsn_tlv_push_vlan_on_ingress : of_bsn_tlv {
     uint16_t type == 128;
     uint16_t length;
+    enum ofp_bsn_push_vlan flags;
 };
 
 // apply_packets and apply_bytes are stat counters, like rx_packet
@@ -979,6 +993,7 @@ struct of_bsn_tlv_port_usage : of_bsn_tlv {
 
 enum ofp_bsn_tunnel_type(wire_type=uint64_t, bitmask=True) {
     OFP_BSN_TUNNEL_L2GRE = 0x1,
+    OFP_BSN_TUNNEL_VXLAN = 0x2,
 };
 
 struct of_bsn_tlv_tunnel_capability : of_bsn_tlv {
@@ -1124,3 +1139,368 @@ struct of_bsn_tlv_virtual : of_bsn_tlv {
     uint16_t type == 158;
     uint16_t length;
 };
+
+struct of_bsn_tlv_pdua_rx_instance : of_bsn_tlv {
+    uint16_t type == 159;
+    uint16_t length;
+    of_octets_t value;
+};
+
+enum ofp_bsn_lag_flag(wire_type=uint16_t, bitmask=True) {
+    OFP_BSN_LAG_FLAG_AUTO_RECOVERY = 0x01,
+};
+
+struct of_bsn_tlv_lag_options : of_bsn_tlv {
+    uint16_t type == 160;
+    uint16_t length;
+    enum ofp_bsn_lag_flag flags;
+};
+
+enum ofp_bsn_routing_param(wire_type=uint16_t) {
+    OFP_BSN_ROUTING_PARAM_OSPF_UCAST = 1,
+    OFP_BSN_ROUTING_PARAM_OSPF_MCAST = 2,
+    OFP_BSN_ROUTING_PARAM_ARP_FRR = 3,
+    OFP_BSN_ROUTING_PARAM_IPV6_OSPF_UCAST = 4,
+    OFP_BSN_ROUTING_PARAM_IPV6_OSPF_MCAST = 5,
+    OFP_BSN_ROUTING_PARAM_IPV6_NDP_FRR = 6,
+};
+
+struct of_bsn_tlv_routing_param : of_bsn_tlv {
+    uint16_t type == 161;
+    uint16_t length;
+    enum ofp_bsn_routing_param value;
+};
+
+struct of_bsn_tlv_push_vlan_on_egress : of_bsn_tlv {
+    uint16_t type == 162;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_flood : of_bsn_tlv {
+    uint16_t type == 163;
+    uint16_t length;
+};
+
+enum ofp_bsn_upgrade(wire_type=uint16_t) {
+    OFP_BSN_UPGRADE_INVALID = 0,
+    OFP_BSN_UPGRADE_IN_PROGRESS = 1,
+};
+
+struct of_bsn_tlv_upgrade : of_bsn_tlv {
+    uint16_t type == 164;
+    uint16_t length;
+    enum ofp_bsn_upgrade value;
+};
+
+enum ofp_bsn_fabric_port_role(wire_type=uint16_t) {
+    OFP_BSN_FABRIC_PORT_ROLE_PARTITIONED_SPINE = 1,
+};
+
+struct of_bsn_tlv_fabric_port_role : of_bsn_tlv {
+    uint16_t type == 165;
+    uint16_t length;
+    enum ofp_bsn_fabric_port_role value;
+};
+
+struct of_bsn_tlv_user_configured : of_bsn_tlv {
+    uint16_t type == 166;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_uint32 : of_bsn_tlv {
+    uint16_t type == 167;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_l3 : of_bsn_tlv {
+    uint16_t type == 168;
+    uint16_t length;
+};
+
+enum ofp_bsn_ip_tunnel_type(wire_type=uint16_t) {
+    OFP_BSN_IP_TUNNEL_TYPE_NONE = 0,
+    OFP_BSN_IP_TUNNEL_TYPE_PIM = 1,
+};
+
+struct of_bsn_tlv_ip_tunnel_type : of_bsn_tlv {
+    uint16_t type == 169;
+    uint16_t length;
+    enum ofp_bsn_ip_tunnel_type value;
+};
+
+enum ofp_bsn_multicast_packet(wire_type=uint16_t) {
+    OFP_BSN_MULTICAST_PACKET_NONE = 0,
+    OFP_BSN_MULTICAST_PACKET_PIM_HELLO = 1,
+    OFP_BSN_MULTICAST_PACKET_PIM_JOIN_PRUNE = 2,
+    OFP_BSN_MULTICAST_PACKET_PIM_ASSERT = 3,
+};
+
+struct of_bsn_tlv_multicast_packet : of_bsn_tlv {
+    uint16_t type == 170;
+    uint16_t length;
+    enum ofp_bsn_multicast_packet value;
+};
+
+struct of_bsn_tlv_pim_dr : of_bsn_tlv {
+    uint16_t type == 171;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_passive : of_bsn_tlv {
+    uint16_t type == 172;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_identifier : of_bsn_tlv {
+    uint16_t type == 173;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_multiplier : of_bsn_tlv {
+    uint16_t type == 174;
+    uint16_t length;
+    uint32_t value;
+};
+
+enum ofp_bsn_encap(wire_type=uint8_t) {
+    OFP_BSN_ENCAP_UNUSED = 0,
+    OFP_BSN_ENCAP_IPV4_UDP = 1,
+    OFP_BSN_ENCAP_IPV6_UDP = 2,
+};
+
+struct of_bsn_tlv_encap : of_bsn_tlv {
+    uint16_t type == 175;
+    uint16_t length;
+    enum ofp_bsn_encap value;
+};
+
+enum ofp_bsn_bfd_endpoint(wire_type=uint8_t) {
+    OFP_BSN_BFD_UNUSED = 0,
+    OFP_BSN_BFD_MICRO = 1,
+    OFP_BSN_BFD_1_HOP = 2,
+    OFP_BSN_BFD_MULTI_HOP = 3,
+};
+
+struct of_bsn_tlv_bfd_endpoint : of_bsn_tlv {
+    uint16_t type == 176;
+    uint16_t length;
+    enum ofp_bsn_bfd_endpoint value;
+};
+
+enum ofp_bsn_bfd_endpoint_state(wire_type=uint8_t) {
+    OFP_BSN_BFD_ENDPOINT_STATE_ADMINDOWN = 0,
+    OFP_BSN_BFD_ENDPOINT_STATE_DOWN = 1,
+    OFP_BSN_BFD_ENDPOINT_STATE_INIT = 2,
+    OFP_BSN_BFD_ENDPOINT_STATE_UP = 3,
+    OFP_BSN_BFD_ENDPOINT_SESSION_ERROR = 4,
+    OFP_BSN_BFD_ENDPOINT_REMOTE_ADMINDOWN = 5,
+    OFP_BSN_BFD_ENDPOINT_PARAMS_CHANGE = 6,
+};
+
+struct of_bsn_tlv_bfd_state : of_bsn_tlv {
+    uint16_t type == 177;
+    uint16_t length;
+    enum ofp_bsn_bfd_endpoint_state value;
+};
+
+struct of_bsn_tlv_lr_all_enabled : of_bsn_tlv {
+    uint16_t type == 178;
+    uint16_t length;
+};
+
+enum ofp_bsn_port_mode(wire_type=uint16_t) {
+    OFP_BSN_PORT_MODE_NONE = 0,
+    OFP_BSN_PORT_MODE_4XX = 1,
+    OFP_BSN_PORT_MODE_4X1 = 2,
+    OFP_BSN_PORT_MODE_4X10 = 3,
+    OFP_BSN_PORT_MODE_4X25 = 4,
+    OFP_BSN_PORT_MODE_2X50 = 5,
+    OFP_BSN_PORT_MODE_1X1 = 6,
+    OFP_BSN_PORT_MODE_1X10 = 7,
+    OFP_BSN_PORT_MODE_1X25 = 8,
+    OFP_BSN_PORT_MODE_1X40 = 9,
+    OFP_BSN_PORT_MODE_1X100 = 10,
+};
+
+struct of_bsn_tlv_port_mode : of_bsn_tlv {
+    uint16_t type == 179;
+    uint16_t length;
+    enum ofp_bsn_port_mode value;
+};
+
+enum ofp_bsn_udf_mode(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_UDF_8X2_BYTES = 0x1,
+};
+
+struct of_bsn_tlv_udf_capability : of_bsn_tlv {
+    uint16_t type == 180;
+    uint16_t length;
+    enum ofp_bsn_udf_mode value;
+};
+
+struct of_bsn_tlv_pim_hello_flood : of_bsn_tlv {
+    uint16_t type == 181;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_flow_classify : of_bsn_tlv {
+    uint16_t type == 182;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_flow_identifier : of_bsn_tlv {
+    uint16_t type == 183;
+    uint16_t length;
+    uint32_t value;
+};
+
+enum ofp_bsn_flow_classifier(wire_type=uint16_t) {
+    OFP_BSN_FLOW_CLASSIFIER_NONE = 0,
+    OFP_BSN_FLOW_CLASSIFIER_L2BC = 1,
+    OFP_BSN_FLOW_CLASSIFIER_L2UC = 2,
+    OFP_BSN_FLOW_CLASSIFIER_L2UNKNOWN = 3,
+    OFP_BSN_FLOW_CLASSIFIER_L2MCKNOWN = 4,
+    OFP_BSN_FLOW_CLASSIFIER_L2MCUNKNOWN = 5,
+    OFP_BSN_FLOW_CLASSIFIER_L3MCUNKNOWN = 6,
+    OFP_BSN_FLOW_CLASSIFIER_L3MCKNOWN = 7,
+    OFP_BSN_FLOW_CLASSIFIER_L3UCKNOWN = 8,
+    OFP_BSN_FLOW_CLASSIFIER_L3UCUNKNOWN = 9,
+};
+
+struct of_bsn_tlv_flow_classifier : of_bsn_tlv {
+    uint16_t type == 184;
+    uint16_t length;
+    enum ofp_bsn_flow_classifier value;
+};
+
+struct of_bsn_tlv_disable_xmit : of_bsn_tlv {
+    uint16_t type == 185;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_preserve_vlan : of_bsn_tlv {
+    uint16_t type == 186;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_drop_control : of_bsn_tlv {
+    uint16_t type == 187;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_lossless : of_bsn_tlv {
+    uint16_t type == 188;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_redundant_mgmt : of_bsn_tlv {
+    uint16_t type == 189;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_dns_analytics : of_bsn_tlv {
+    uint16_t type == 190;
+    uint16_t length;
+};
+
+enum ofp_bsn_cml(wire_type=uint16_t) {
+    OFP_BSN_CML_NONE = 0,
+    OFP_BSN_CML_CPU_DROP = 1,
+    OFP_BSN_CML_FORWARD = 2,
+    OFP_BSN_CML_CPU_FORWARD = 3,
+};
+
+struct of_bsn_tlv_src_mac_cml : of_bsn_tlv {
+    uint16_t type == 191;
+    uint16_t length;
+    enum ofp_bsn_cml value;
+};
+
+struct of_bsn_tlv_active : of_bsn_tlv {
+    uint16_t type == 192;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_link_up : of_bsn_tlv {
+    uint16_t type == 193;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_fail_count : of_bsn_tlv {
+    uint16_t type == 194;
+    uint16_t length;
+    uint64_t value;
+};
+
+struct of_bsn_tlv_egress_sampling_rate : of_bsn_tlv {
+    uint16_t type == 195;
+    uint16_t length;
+    uint32_t value; //Every 1/value egressing packets will be sampled;
+                    //0 indicates no sampling; 1 indicates sampling all packets
+};
+
+struct of_bsn_tlv_l2_cache_hit : of_bsn_tlv {
+    uint16_t type == 196;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_inner_vlan_vid : of_bsn_tlv {
+    uint16_t type == 197;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_arp_tpa : of_bsn_tlv {
+    uint16_t type == 198;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_arp_spa : of_bsn_tlv {
+    uint16_t type == 199;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_ifp_class_id : of_bsn_tlv {
+    uint16_t type == 200;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_ip_fragmentation : of_bsn_tlv {
+    uint16_t type == 201;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_sctp_src : of_bsn_tlv {
+    uint16_t type == 202;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_sctp_dst : of_bsn_tlv {
+    uint16_t type == 203;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_icmpv6_type : of_bsn_tlv {
+    uint16_t type == 204;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_icmpv6_code : of_bsn_tlv {
+    uint16_t type == 205;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_analytics : of_bsn_tlv {
+    uint16_t type == 206;
+    uint16_t length;
+};
+

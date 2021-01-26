@@ -32,9 +32,8 @@ Code generation functions for LOCI
 
 import sys
 import c_gen.of_g_legacy as of_g
-import c_match
 from generic_utils import *
-from c_gen import flags, type_maps, c_type_maps
+from c_gen import flags, type_maps, c_match, c_type_maps
 import c_gen.loxi_utils_legacy as loxi_utils
 import loxi_globals
 
@@ -228,7 +227,7 @@ def identifiers_gen(out, filename):
 
     # For each group of identifiers, bunch ident defns
     count = 1
-    keys = of_g.identifiers_by_group.keys()
+    keys = list(of_g.identifiers_by_group.keys())
     keys.sort()
     for group in keys:
         idents = of_g.identifiers_by_group[group]
@@ -241,7 +240,7 @@ def identifiers_gen(out, filename):
         for ident in idents:
             info = of_g.identifiers[ident]
 
-            keys = info["values_by_version"].keys()
+            keys = list(info["values_by_version"].keys())
             keys.sort()
 
             out.write("""
@@ -663,6 +662,11 @@ typedef char of_table_name_t[OF_MAX_TABLE_NAME_LEN];
 typedef char of_desc_str_t[OF_DESC_STR_LEN];
 typedef char of_serial_num_t[OF_SERIAL_NUM_LEN];
 typedef char of_str64_t[64];
+
+typedef struct uint128_s {
+    uint64_t hi;
+    uint64_t lo;
+} uint128_t;
 
 typedef struct of_bitmap_128_s {
     uint64_t hi;
@@ -1177,7 +1181,7 @@ def length_of(m_type, version):
         return of_g.of_base_types[m_type]["bytes"]
     if (m_type[:-2], version) in of_g.base_length:
         return of_g.base_length[(m_type[:-2], version)]
-    print "Unknown length request", m_type, version
+    print("Unknown length request", m_type, version)
     sys.exit(1)
 
 
@@ -1627,7 +1631,7 @@ of_object_t *
     %(cls)s_init(obj, version, bytes, 0);
 """ % dict(cls=cls, enum=enum_name(cls), max_length=max_length))
     if not type_maps.class_is_virtual(cls):
-        from codegen import class_metadata_dict
+        from .codegen import class_metadata_dict
         metadata = class_metadata_dict[cls]
 
         if metadata.wire_type_set != 'NULL':

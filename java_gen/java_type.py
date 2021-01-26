@@ -7,6 +7,7 @@ import time
 import loxi_globals
 from generic_utils import memoize
 import loxi_utils.loxi_utils as loxi_utils
+from functools import reduce
 
 def erase_type_annotation(class_name):
     m=re.match(r'(.*)<.*>', class_name)
@@ -74,15 +75,17 @@ def format_primitive_literal(t, value):
 ANY = 0xFFFFFFFFFFFFFFFF
 
 class VersionOp:
-    def __init__(self, version=ANY, read=None, write=None, default=None, funnel=None):
+    def __init__(self, version=ANY, read=None, write=None, default=None, funnel=None, normalize=None):
         self.version = version
         self.read = read
         self.write = write
         self.default = default
         self.funnel = funnel
+        self.normalize = normalize
 
     def __str__(self):
-        return "[Version: %d, Read: '%s', Write: '%s', Default: '%s', Funnel: '%s' ]" % (self.version, self.read, self.write, self.default, self.funnel )
+        return "[Version: %d, Read: '%s', Write: '%s', Default: '%s', Funnel: '%s', Normalize: '%s' ]" % \
+            (self.version, self.read, self.write, self.default, self.funnel, self.normalize )
 
 ### FIXME: This class should really be cleaned up
 class JType(object):
@@ -102,7 +105,7 @@ class JType(object):
         self.priv_type = priv_type
         return self
 
-    def op(self, version=ANY, read=None, write=None, default=None, funnel=None, pub_type=ANY):
+    def op(self, version=ANY, read=None, write=None, default=None, funnel=None, normalize=None, pub_type=ANY):
         """
         define operations to be performed for reading and writing this type
         (when read_op, write_op is called). The operations 'read' and 'write'
@@ -118,7 +121,7 @@ class JType(object):
 
         pub_types = [ pub_type ] if pub_type is not ANY else [ False, True ]
         for pub_type in pub_types:
-            self.ops[(version, pub_type)] = VersionOp(version, read, write, default, funnel)
+            self.ops[(version, pub_type)] = VersionOp(version, read, write, default, funnel, normalize)
         return self
 
     def format_value(self, value, pub_type=True):
@@ -207,6 +210,16 @@ class JType(object):
             default_value = self.format_value(0) if self.is_primitive else "null"
         )
 
+    def normalize_op(self, version=None, name=None, pub_type=True):
+        """ return a Java stanza that returns a default value of this JType.
+        @param version JavaOFVersion
+        @return string containing generated Java expression.
+        """
+        return self.get_op("normalize", version, pub_type,
+            arguments = dict(name=name),
+            default_value = name
+        )
+
     def skip_op(self, version=None, length=None):
         """ return a java stanza that skips an instance of JType in the input ByteBuf 'bb'.
             This is used in the Reader implementations for virtual classes (because after the
@@ -281,7 +294,7 @@ def gen_fixed_length_string_jtype(length):
 # FIXME: This list needs to be pruned / cleaned up. Most of these are schematic.
 
 u8 =  JType('short', 'byte') \
-        .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', pub_type=True) \
+        .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', normalize="U8.normalize($name)", pub_type=True) \
         .op(read='bb.readByte()', write='bb.writeByte($name)', pub_type=False)
 u8_list =  JType('List<U8>') \
         .op(read='ChannelUtils.readList(bb, $length, U8.READER)',
@@ -290,10 +303,15 @@ u8_list =  JType('List<U8>') \
             funnel='FunnelUtils.putList($name, sink)'
            )
 u16 = JType('int', 'short') \
-        .op(read='U16.f(bb.readShort())', write='bb.writeShort(U16.t($name))', pub_type=True) \
+        .op(read='U16.f(bb.readShort())', write='bb.writeShort(U16.t($name))', normalize="U16.normalize($name)", pub_type=True) \
         .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
+u16_list = JType('List<U16>', 'short[]') \
+        .op(read='ChannelUtils.readList(bb, $length, U16.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default='ImmutableList.<U16>of()',
+            funnel='FunnelUtils.putList($name, sink)')
 u32 = JType('long', 'int') \
-        .op(read='U32.f(bb.readInt())', write='bb.writeInt(U32.t($name))', pub_type=True) \
+        .op(read='U32.f(bb.readInt())', write='bb.writeInt(U32.t($name))', normalize="U32.normalize($name)", pub_type=True) \
         .op(read='bb.readInt()', write='bb.writeInt($name)', pub_type=False)
 u32_list = JType('List<U32>', 'int[]') \
         .op(
@@ -573,6 +591,22 @@ table_desc = JType('OFTableDesc') \
         .op(read='OFTableDescVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
 
+bsn_unit = JType('OFBsnUnit') \
+        .op(read='OFBsnUnitVer$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
+bsn_module_eeprom_transceiver = JType('OFBsnModuleEepromTransceiver') \
+        .op(read='OFBsnModuleEepromTransceiverVer$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
+port_desc_prop_bsn_alarm = JType('OFPortDescPropBsnAlarm') \
+        .op(read='OFPortDescPropBsnAlarm$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
+port_desc_prop_bsn_diag = JType('OFPortDescPropBsnDiag') \
+        .op(read='OFPortDescPropBsnDiag$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
 controller_status_entry = JType('OFControllerStatusEntry') \
         .op(read='OFControllerStatusEntryVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
@@ -582,6 +616,7 @@ default_mtype_to_jtype_convert_map = {
         'uint16_t' : u16,
         'uint32_t' : u32,
         'uint64_t' : u64,
+        'uint128_t' : u128,
         'of_port_no_t' : of_port,
         'list(of_action_t)' : actions_list,
         'list(of_instruction_t)' : instructions_list,
@@ -590,6 +625,7 @@ default_mtype_to_jtype_convert_map = {
         'list(of_packet_queue_t)' : packet_queue_list,
         'list(of_uint64_t)' : u64_list,
         'list(of_uint32_t)' : u32_list,
+        'list(of_uint16_t)' : u16_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
         'list(of_oxs_t)' : oxs_list,
@@ -618,6 +654,10 @@ default_mtype_to_jtype_convert_map = {
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
         'of_table_desc_t': table_desc,
+        'of_bsn_unit_t': bsn_unit,
+        'ofp_bsn_module_eeprom_transceiver_t': bsn_module_eeprom_transceiver,
+        'of_port_desc_prop_bsn_alarm_t': port_desc_prop_bsn_alarm,
+        'of_port_desc_prop_bsn_diag_t': port_desc_prop_bsn_diag,
         'of_controller_status_entry_t' : controller_status_entry,
         'of_time_t' : of_time,
         'of_header_t' : of_message,
@@ -777,6 +817,42 @@ exceptions = {
         'of_oxm_bsn_ip_fragmentation' : { 'value' : boolean_value },
         'of_oxm_bsn_ip_fragmentation_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
+        'of_oxm_bsn_ifp_class_id' : { 'value' : class_id },
+        'of_oxm_bsn_ifp_class_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+        
+        'of_oxm_conn_tracking_state' : { 'value' : u32obj },
+        'of_oxm_conn_tracking_state_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+
+        'of_oxm_conn_tracking_zone' : { 'value' : u16obj },
+        'of_oxm_conn_tracking_zone_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
+
+        'of_oxm_conn_tracking_mark' : { 'value' : u32obj },
+        'of_oxm_conn_tracking_mark_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+        
+        'of_oxm_conn_tracking_label' : { 'value' : u128 },
+        'of_oxm_conn_tracking_label_masked' : { 'value' : u128, 'value_mask' : u128 },
+        
+        'of_oxm_conn_tracking_nw_proto' : { 'value' : u8obj },
+        'of_oxm_conn_tracking_nw_proto_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
+
+        'of_oxm_conn_tracking_nw_src' : { 'value' : u32obj },
+        'of_oxm_conn_tracking_nw_src_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+
+        'of_oxm_conn_tracking_nw_dst' : { 'value' : u32obj },
+        'of_oxm_conn_tracking_nw_dst_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+        
+        'of_oxm_conn_tracking_ipv6_src' : { 'value' : ipv6 },
+        'of_oxm_conn_tracking_ipv6_src_masked' : { 'value' : ipv6, 'value_mask' : ipv6 },
+        
+        'of_oxm_conn_tracking_ipv6_dst' : { 'value' : ipv6 },
+        'of_oxm_conn_tracking_ipv6_dst_masked' : { 'value' : ipv6, 'value_mask' : ipv6 },
+
+        'of_oxm_conn_tracking_tp_src' : { 'value' : transport_port },
+        'of_oxm_conn_tracking_tp_src_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+
+        'of_oxm_conn_tracking_tp_dst' : { 'value' : transport_port },
+        'of_oxm_conn_tracking_tp_dst_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,
@@ -908,7 +984,7 @@ def convert_to_jtype(obj_name, field_name, c_type):
     elif c_type in enum_java_types():
         return enum_java_types()[c_type]
     else:
-        print "WARN: Couldn't find java type conversion for '%s' in %s:%s" % (c_type, obj_name, field_name)
+        print("WARN: Couldn't find java type conversion for '%s' in %s:%s" % (c_type, obj_name, field_name))
         jtype = name_c_to_caps_camel(re.sub(r'_t$', "", c_type))
         return JType(jtype)
 
@@ -919,6 +995,7 @@ enum_wire_types = {
         "uint16_t": JType("short").op(read="bb.readShort()", write="bb.writeShort($name)"),
         "uint32_t": JType("int").op(read="bb.readInt()", write="bb.writeInt($name)"),
         "uint64_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
+        "uint128_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
 }
 
 def convert_enum_wire_type_to_jtype(wire_type):
